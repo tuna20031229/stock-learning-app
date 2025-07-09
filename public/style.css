@@ -1,0 +1,52 @@
+body {
+    font-family: sans-serif;
+    line-height: 1.6;
+    margin: 20px;
+}
+
+.main-container {
+    display: flex;
+    gap: 20px;
+}
+
+.list-container, .detail-container {
+    border: 1px solid #ccc;
+    padding: 15px;
+    border-radius: 5px;
+}
+
+.list-container {
+    width: 40%;
+}
+
+.detail-container {
+    width: 60%;
+}
+
+#terms-list {
+    list-style: none;
+    padding: 0;
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+#terms-list li {
+    padding: 8px;
+    border-bottom: 1px solid #eee;
+    cursor: pointer; /* クリックできることを示す */
+}
+
+#terms-list li:hover {
+    background-color: #f0f0f0;
+}
+
+#search-input {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 20px;
+    box-sizing: border-box; /* paddingを含めてwidth 100%にする */
+}
+
+#term-detail h3 {
+    margin-top: 0;
+}
