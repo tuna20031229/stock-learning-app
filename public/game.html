@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>チャート予測ゲーム</title>
+    <link rel="stylesheet" href="style.css"> </head>
+<body>
+    <div class="app-container">
+        <h1>チャート予測ゲーム</h1>
+        <a href="/" style="display: block; text-align: center; margin-bottom: 20px;">用語集に戻る</a>
+
+        <div style="width: 100%; max-width: 800px; margin: auto;">
+            <canvas id="stockChart"></canvas>
+        </div>
+        <div id="game-controls" style="text-align: center; margin-top: 20px;">
+            <p id="question-text">この後の株価は上がる？下がる？</p>
+            <button id="buy-button">上がる(買い)</button>
+            <button id="sell-button">下がる(売り)</button>
+            <div id="result-text" style="font-size: 1.5em; font-weight: bold; margin-top: 10px;"></div>
+            <button id="next-button" style="display: none; margin-top: 10px;">次の問題へ</button>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="game.js"></script>
+</body>
+</html>
