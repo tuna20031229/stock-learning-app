@@ -1,0 +1,18 @@
+// prisma/schema.prisma
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// 株用語を保存するテーブルの定義
+model StockTerm {
+  id          Int      @id @default(autoincrement())
+  term        String   @unique // 用語名はユニーク（重複なし）
+  description String
+  createdAt   DateTime @default(now()) // 作成日時
+}

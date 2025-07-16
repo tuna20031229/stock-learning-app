@@ -1,17 +1,26 @@
 const express = require('express');
 const path = require('path');
+// Prisma Clientをインポート
+const { PrismaClient } = require('@prisma/client');
 
-const stockTerms = require('../data/stockTerms'); // 作成したモックデータを読み込む
+// Prisma Clientのインスタンスを作成
+const prisma = new PrismaClient();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// 'public' ディレクトリを静的ファイル配信用に設定
 app.use(express.static(path.join(__dirname, '../public')));
 
-// '/api/terms' というURLにGETリクエストが来たら、JSON形式で株用語データを返す
-app.get('/api/terms', (req, res) => {
-    res.json(stockTerms);
+// '/api/terms'のエンドポイントをasync/awaitを使って書き換える
+app.get('/api/terms', async (req, res) => {
+    try {
+        // Prismaを使ってデータベースから全ての用語を取得
+        const terms = await prisma.stockTerm.findMany();
+        res.json(terms);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'データベースからの取得に失敗しました。' });
+    }
 });
 
 app.listen(PORT, () => {

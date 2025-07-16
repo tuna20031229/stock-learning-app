@@ -7,11 +7,16 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node src/server.js"
   },
+  "prisma": {
+    "seed": "node prisma/seed.js"
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
-    "express": "^5.1.0"
+    "@prisma/client": "^6.11.1",
+    "express": "^5.1.0",
+    "prisma": "^6.11.1"
   }
 }
