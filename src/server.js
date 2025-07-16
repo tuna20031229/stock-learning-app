@@ -25,37 +25,45 @@ app.get("/api/terms", async (req, res) => {
 });
 
 app.get('/api/game/chart', async (req, res) => {
-    // ゲームで使う銘柄リスト（今回は米国の有名企業）
+    console.log("1. APIルート /api/game/chart が呼び出されました。"); // ログ ステップ1
+
     const tickers = ['AAPL', 'GOOGL', 'MSFT', 'AMZN', 'TSLA'];
-    // リストからランダムに1つ選ぶ
     const randomTicker = tickers[Math.floor(Math.random() * tickers.length)];
     const apiKey = process.env.ALPHA_VANTAGE_API_KEY;
+
+    if (!apiKey) {
+        console.error("エラー: サーバーにALPHA_VANTAGE_API_KEYが設定されていません。");
+        return res.status(500).json({ error: 'サーバー設定エラーです。' });
+    }
 
     const url = `https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=${randomTicker}&apikey=${apiKey}&outputsize=compact`;
 
     try {
-        const response = await axios.get(url);
+        console.log(`2. Alpha Vantage APIを呼び出します。銘柄: ${randomTicker}`); // ログ ステップ2
+        // 10秒のタイムアウトを追加
+        const response = await axios.get(url, { timeout: 10000 }); 
+        console.log("3. Alpha Vantageから正常に応答を受け取りました。"); // ログ ステップ3
+
         const timeSeries = response.data['Time Series (Daily)'];
 
         if (!timeSeries) {
-            // APIからのデータが期待通りでない場合
-            return res.status(500).json({ error: '外部APIからデータを取得できませんでした。' });
+            console.error("エラー: Alpha Vantageからのデータ構造が無効です:", response.data);
+            return res.status(500).json({ error: '外部APIが無効なデータを返しました。' });
         }
 
-        // データを使いやすい形式に加工
         const processedData = Object.entries(timeSeries).map(([date, values]) => ({
             date: date,
             price: parseFloat(values['4. close']),
-        })).slice(0, 100).reverse(); // 最新から100日分を取得し、日付を昇順に並べ替え
+        })).slice(0, 100).reverse();
 
+        console.log("4. 処理済みデータをフロントエンドに送信します。"); // ログ ステップ4
         res.json(processedData);
 
     } catch (error) {
-    // ▼▼▼ この行を追加 ▼▼▼
-    console.error("Alpha Vantage API Error:", error.message); 
-    // ▲▲▲ この行を追加 ▲▲▲
-    res.status(500).json({ error: 'チャートデータの取得中にエラーが発生しました。' });
-}
+        // ログ ステップ5
+        console.error("5. CATCHブロックでエラーを捕捉しました:", error.message); 
+        res.status(500).json({ error: 'チャートデータの取得中にエラーが発生しました。' });
+    }
 });
 
 app.listen(PORT, () => {
