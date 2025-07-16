@@ -3,29 +3,27 @@ document.addEventListener('DOMContentLoaded', () => {
     const searchInputElement = document.getElementById('search-input');
     const termDetailElement = document.getElementById('term-detail');
 
-    // 取得した全用語データをここに保存する
     let allTerms = [];
 
     // --- 関数定義 ---
-
-    // 用語リストを表示する関数
     const displayTerms = (terms) => {
-        termsListElement.innerHTML = ''; // リストを一旦空にする
+        termsListElement.innerHTML = '';
         if (terms.length === 0) {
-            termsListElement.innerHTML = '<li>該当する用語はありません。</li>';
+            const messageItem = document.createElement('li');
+            messageItem.textContent = '該当する用語はありません。';
+            messageItem.style.cursor = 'default';
+            termsListElement.appendChild(messageItem);
             return;
         }
         terms.forEach(term => {
             const listItem = document.createElement('li');
             listItem.textContent = term.term;
-            listItem.dataset.id = term.id; // 詳細表示のためにIDをdata属性に保存
+            listItem.dataset.id = term.id;
             termsListElement.appendChild(listItem);
         });
     };
 
-    // 用語の詳細を表示する関数
     const displayTermDetail = (termId) => {
-        // allTermsの中から、指定されたIDの用語を見つける
         const term = allTerms.find(t => t.id === Number(termId));
         if (term) {
             termDetailElement.innerHTML = `
@@ -37,21 +35,32 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- 初期化処理 ---
 
-    // 最初に全データをサーバーから取得
+    // ▼▼▼ ここから変更 ▼▼▼
+    // ローディングメッセージを表示
+    termsListElement.innerHTML = '<li>ローディング中...</li>';
+    termDetailElement.innerHTML = '<p>用語を読み込んでいます。</p>';
+
     fetch('/api/terms')
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('ネットワークの応答が正しくありません。');
+            }
+            return response.json();
+        })
         .then(data => {
-            allTerms = data; // 取得したデータを保存
-            displayTerms(allTerms); // 全リストを初期表示
+            allTerms = data;
+            displayTerms(allTerms);
+            // 初期メッセージに戻す
+            termDetailElement.innerHTML = '<p>リストから用語を選択すると、ここに詳細が表示されます。</p>';
         })
         .catch(error => {
             console.error('データの取得に失敗しました:', error);
             termsListElement.innerHTML = '<li>データの読み込みに失敗しました。</li>';
+            termDetailElement.innerHTML = '<p>エラーが発生しました。ページを再読み込みしてください。</p>';
         });
+    // ▲▲▲ ここまで変更 ▲▲▲
 
     // --- イベントリスナー設定 ---
-
-    // 検索入力時のイベント
     searchInputElement.addEventListener('input', (event) => {
         const keyword = event.target.value.toLowerCase();
         const filteredTerms = allTerms.filter(term => 
@@ -60,9 +69,8 @@ document.addEventListener('DOMContentLoaded', () => {
         displayTerms(filteredTerms);
     });
 
-    // 用語リストクリック時のイベント (イベント委任)
     termsListElement.addEventListener('click', (event) => {
-        if (event.target && event.target.nodeName === 'LI') {
+        if (event.target && event.target.dataset.id) { // IDがある要素のみ反応
             const termId = event.target.dataset.id;
             displayTermDetail(termId);
         }
